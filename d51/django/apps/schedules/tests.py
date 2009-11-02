@@ -45,7 +45,43 @@ class TestOfSchedule(TestCase):
             content_object=b
         )
 
-        expected = ScheduledItem.objects.get(object_id=a.pk)
-        self.assertEqual(1, ScheduledItem.objects.available().count())
-        self.assertEqual(expected, ScheduledItem.objects.available()[0])
+        available = ScheduledItem.objects.available().return_related()
+
+        self.assertEqual(1, available.count())
+        self.assertEqual(a, available[0])
+
+    def test_you_can_call_return_related_on_manager_as_well(self):
+        [a, b] = random_posts(2)
+        now = datetime.now()
+        ScheduledItem.objects.create(
+            published=now,
+            content_object=a
+        )
+        ScheduledItem.objects.create(
+            published=datetime(now.year+1, now.month, now.day),
+            content_object=b
+        )
+
+        available = ScheduledItem.objects.return_related().available()
+
+        self.assertEqual(1, available.count())
+        self.assertEqual(a, available[0])
+
+    def test_using_return_related_does_not_affect_original_querysets(self):
+        [a, b] = random_posts(2)
+        now = datetime.now()
+        ScheduledItem.objects.create(
+            published=now,
+            content_object=a
+        )
+        ScheduledItem.objects.create(
+            published=datetime(now.year+1, now.month, now.day),
+            content_object=b
+        )
+
+        available_queryset = ScheduledItem.objects.available()
+        self.assertNotEqual(available_queryset, available_queryset.return_related())
+
+
+
 
