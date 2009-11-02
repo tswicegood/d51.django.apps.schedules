@@ -17,8 +17,13 @@ class ScheduledItemQuerySet(models.query.QuerySet):
             return item.content_object
         return item
 
-    def available(self):
-        ret = self.filter(published__lte=datetime.datetime.now())
+    def available(self, model=None):
+        query_params = {
+            "published__lte": datetime.datetime.now(),
+        }
+        if model:
+            query_params["content_type"] = ContentType.objects.get(name=model.__name__.lower())
+        ret = self.filter(**query_params)
         ret._return_related = self._return_related
         return ret
 
@@ -29,8 +34,8 @@ class ScheduledItemManager(models.Manager):
     def get_query_set(self):
         return ScheduledItemQuerySet(self.model)
 
-    def available(self):
-        return self.get_query_set().available()
+    def available(self, model=None):
+        return self.get_query_set().available(model)
 
 class ScheduledItem(models.Model):
     published = models.DateTimeField()
