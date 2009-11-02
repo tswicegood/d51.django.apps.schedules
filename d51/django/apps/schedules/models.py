@@ -6,6 +6,11 @@ from django.contrib.contenttypes import generic
 class ScheduledItemQuerySet(models.query.QuerySet):
     _return_related = False
 
+    def _clone(self, *args, **kwargs):
+        c = super(self.__class__, self)._clone(*args, **kwargs)
+        c._return_related = self._return_related
+        return c
+
     def return_related(self, do=True):
         clone = self._clone()
         clone._return_related = True
@@ -23,9 +28,7 @@ class ScheduledItemQuerySet(models.query.QuerySet):
         }
         if model:
             query_params["content_type"] = ContentType.objects.get(name=model.__name__.lower())
-        ret = self.filter(**query_params)
-        ret._return_related = self._return_related
-        return ret
+        return self.filter(**query_params)
 
 class ScheduledItemManager(models.Manager):
     def return_related(self):
