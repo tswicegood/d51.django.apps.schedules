@@ -27,7 +27,7 @@ class ScheduledItemQuerySet(models.query.QuerySet):
             "published__lte": datetime.datetime.now(),
         }
         if model:
-            query_params["content_type"] = ContentType.objects.get(name=model.__name__.lower())
+            query_params["content_type"] = ContentType.objects.get_for_model(model)
         return self.filter(**query_params)
 
 class ScheduledItemManager(models.Manager):
