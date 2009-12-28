@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
     'd51.django.apps.schedules',
-    'project.mysite',
 )
 
 TEMPLATE_LOADERS = (
