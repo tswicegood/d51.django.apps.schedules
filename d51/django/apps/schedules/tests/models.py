@@ -123,5 +123,3 @@ class TestOfSchedule(TestCase):
         available = ScheduledItem.objects.available(Post).return_related()
         self.assertEqual(1, available.count())
 
-
-
