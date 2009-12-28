@@ -1,22 +1,21 @@
 from d51.django.apps.schedules.models import *
+from d51.django.apps.schedules.tests.support.models import Post, Article
+from d51.django.apps.schedules.tests.utils import *
 from datetime import datetime
 from django.test import TestCase
-import random
-
-# these tests assume the original repo is in place with
-# project.mysite available
-from project.mysite.models import Post, Article
-
-def random_models(number, model):
-    return [model.objects.create(title=str(random.randint(1*i, 100*i))) for i in range(number)]
-
-def random_posts(number):
-    return random_models(number, Post)
-
-def random_articles(number):
-    return random_models(number, Article)
 
 class TestOfSchedule(TestCase):
+    def setUp(self):
+        # Not sure why, but for some reason ScheduleItem table isn't getting
+        # flushed properly.  We need to make sure to delete everything that's
+        # left over prior to starting the tests.
+        ScheduledItem.objects.all().delete()
+
+        create_model_tables()
+
+    def tearDown(self):
+        destroy_model_tables()
+
     def test_schedules_default_to_reverse_chronological_order(self):
         [a, b, c] = random_posts(3)
 
