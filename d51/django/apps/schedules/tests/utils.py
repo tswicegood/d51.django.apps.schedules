@@ -4,6 +4,7 @@ from django.core.management.color import no_style
 from django.core.management.sql import sql_create, sql_delete, sql_indexes
 from django.db import connection
 import random
+import re
 
 __all__ = [
     'create_model_tables',
@@ -32,8 +33,17 @@ def create_model_tables():
     execute_sql(statements)
 
 def destroy_model_tables():
-    statements = sql_delete(d51.django.apps.schedules.tests.support.models, no_style())
-    execute_sql(statements)
+    try:
+        statements = sql_delete(d51.django.apps.schedules.tests.support.models, no_style())
+        execute_sql(statements)
+    except Exception, e:
+        # Postgres seems to like to pretend that the table isn't there, even
+        # when the database says it is.  We're catching this error here to keep
+        # everyone happy.  "Pick your battles" I believe is the phrase.
+        if re.search('table "[a-z_]+" does not exist', str(e)):
+                return
+        raise e
+
 
 def random_models(number, model):
     return [model.objects.create(title=str(random.randint(1*i, 100*i))) for i in range(number)]
