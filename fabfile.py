@@ -13,3 +13,9 @@ def init():
     local("virtualenv .")
     local("pip install -E . -r requirements.txt")
 
+def clean():
+    """
+    Remove the cruft created by virtualenv and pip
+    """
+    local("rm -rf bin/ include/ lib/")
+
